@@ -1,0 +1,125 @@
+{
+	"name": "NotebookLM - Create and Download Infographic",
+	"nodes": [
+		{
+			"parameters": {},
+			"id": "a1b2c3d4-0006-0001-0001-000000000001",
+			"name": "When clicking 'Test workflow'",
+			"type": "n8n-nodes-base.manualTrigger",
+			"typeVersion": 1,
+			"position": [240, 300]
+		},
+		{
+			"parameters": {
+				"resource": "notebook",
+				"operation": "list"
+			},
+			"id": "a1b2c3d4-0006-0001-0001-000000000002",
+			"name": "List Notebooks",
+			"type": "CUSTOM.notebookLm",
+			"typeVersion": 1,
+			"position": [460, 300],
+			"credentials": {
+				"notebookLmApi": {
+					"id": "1",
+					"name": "NotebookLM account"
+				}
+			}
+		},
+		{
+			"parameters": {
+				"jsCode": "// Notebooks are returned in most-recently-accessed order.\n// Take the first one.\nreturn [$input.first()];"
+			},
+			"id": "a1b2c3d4-0006-0001-0001-000000000003",
+			"name": "Pick Latest Notebook",
+			"type": "n8n-nodes-base.code",
+			"typeVersion": 2,
+			"position": [680, 300]
+		},
+		{
+			"parameters": {
+				"resource": "artifact",
+				"operation": "createInfographic",
+				"notebookId": "={{ $json.id }}"
+			},
+			"id": "a1b2c3d4-0006-0001-0001-000000000004",
+			"name": "Create Infographic",
+			"type": "CUSTOM.notebookLm",
+			"typeVersion": 1,
+			"position": [900, 300],
+			"credentials": {
+				"notebookLmApi": {
+					"id": "1",
+					"name": "NotebookLM account"
+				}
+			}
+		},
+		{
+			"parameters": {
+				"resource": "artifact",
+				"operation": "waitUntilReady",
+				"notebookId": "={{ $('Pick Latest Notebook').first().json.id }}",
+				"artifactId": "={{ $json.artifactId }}",
+				"timeout": 300,
+				"pollInterval": 5
+			},
+			"id": "a1b2c3d4-0006-0001-0001-000000000005",
+			"name": "Wait Until Ready",
+			"type": "CUSTOM.notebookLm",
+			"typeVersion": 1,
+			"position": [1120, 300],
+			"credentials": {
+				"notebookLmApi": {
+					"id": "1",
+					"name": "NotebookLM account"
+				}
+			}
+		},
+		{
+			"parameters": {
+				"resource": "artifact",
+				"operation": "downloadInfographic",
+				"notebookId": "={{ $('Pick Latest Notebook').first().json.id }}",
+				"artifactId": "={{ $json.id }}"
+			},
+			"id": "a1b2c3d4-0006-0001-0001-000000000006",
+			"name": "Download Infographic",
+			"type": "CUSTOM.notebookLm",
+			"typeVersion": 1,
+			"position": [1340, 300],
+			"credentials": {
+				"notebookLmApi": {
+					"id": "1",
+					"name": "NotebookLM account"
+				}
+			}
+		}
+	],
+	"connections": {
+		"When clicking 'Test workflow'": {
+			"main": [
+				[{ "node": "List Notebooks", "type": "main", "index": 0 }]
+			]
+		},
+		"List Notebooks": {
+			"main": [
+				[{ "node": "Pick Latest Notebook", "type": "main", "index": 0 }]
+			]
+		},
+		"Pick Latest Notebook": {
+			"main": [
+				[{ "node": "Create Infographic", "type": "main", "index": 0 }]
+			]
+		},
+		"Create Infographic": {
+			"main": [
+				[{ "node": "Wait Until Ready", "type": "main", "index": 0 }]
+			]
+		},
+		"Wait Until Ready": {
+			"main": [
+				[{ "node": "Download Infographic", "type": "main", "index": 0 }]
+			]
+		}
+	}
+}

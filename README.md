@@ -64,27 +64,35 @@ NotebookLM uses Google session cookies — there is no public API key. You need 
 
 ### Source
 
-| Operation    | Description                             | Parameters                  |
-| ------------ | --------------------------------------- | --------------------------- |
-| List         | List all sources in a notebook          | Notebook ID                 |
-| Add URL      | Add a web URL as a source               | Notebook ID, URL            |
-| Add Text     | Add plain text as a source              | Notebook ID, Title, Content |
-| Get Fulltext | Get the full extracted text of a source | Notebook ID, Source ID      |
-| Delete       | Delete a source                         | Notebook ID, Source ID      |
+| Operation        | Description                             | Parameters                           |
+| ---------------- | --------------------------------------- | ------------------------------------ |
+| List             | List all sources in a notebook          | Notebook ID                          |
+| Add URL          | Add a web URL as a source               | Notebook ID, URL                     |
+| Add Text         | Add plain text as a source              | Notebook ID, Title, Content          |
+| Get Fulltext     | Get the full extracted text of a source | Notebook ID, Source ID               |
+| Wait Until Ready | Poll until a source finishes processing | Notebook ID, Source ID, Timeout      |
+| Delete           | Delete a source                         | Notebook ID, Source ID               |
 
 ### Artifact
 
-| Operation             | Description                                        | Parameters                      |
-| --------------------- | -------------------------------------------------- | ------------------------------- |
-| List                  | List all artifacts                                 | Notebook ID                     |
-| List Audio Overviews  | List audio overview artifacts                      | Notebook ID                     |
-| List Reports          | List report artifacts                              | Notebook ID                     |
-| Create Audio Overview | Generate an audio overview podcast                 | Notebook ID                     |
-| Create Report         | Generate a briefing doc, study guide, or blog post | Notebook ID, Format             |
-| Create Mind Map       | Generate a mind map note                           | Notebook ID                     |
-| Export Report         | Export a report artifact to Google Docs            | Notebook ID, Artifact ID, Title |
+| Operation             | Description                                        | Parameters                                  |
+| --------------------- | -------------------------------------------------- | ------------------------------------------- |
+| List                  | List all artifacts                                 | Notebook ID                                 |
+| List Audio Overviews  | List audio overview artifacts                      | Notebook ID                                 |
+| List Reports          | List report artifacts                              | Notebook ID                                 |
+| Create Audio Overview | Generate an audio overview podcast                 | Notebook ID                                 |
+| Create Report         | Generate a briefing doc, study guide, or blog post | Notebook ID, Format                         |
+| Create Mind Map       | Generate a mind map note                           | Notebook ID                                 |
+| Wait Until Ready      | Poll until an artifact finishes generating         | Notebook ID, Artifact ID, Timeout, Interval |
+| Download Audio        | Download an audio overview as MP3                  | Notebook ID, Artifact ID                    |
+| Download Video        | Download a video artifact as MP4                   | Notebook ID, Artifact ID                    |
+| Download Slide Deck   | Download a slide deck as PDF or PPTX               | Notebook ID, Artifact ID, Format            |
+| Download Infographic  | Download an infographic as PNG                     | Notebook ID, Artifact ID                    |
+| Export Report         | Export a report artifact to Google Docs            | Notebook ID, Artifact ID, Title             |
 
 **Report formats:** `Briefing Doc`, `Study Guide`, `Blog Post`
+
+> Download operations output a **binary item** (field name: `data`). Connect them to nodes like **Write Binary File**, **Send Email**, or **HTTP Request** to use the file.
 
 ### Chat
 
@@ -101,7 +109,7 @@ NotebookLM uses Google session cookies — there is no public API key. You need 
 
 ---
 
-## Example workflow
+## Example workflows
 
 **Summarize a webpage into a NotebookLM notebook:**
 
@@ -109,6 +117,21 @@ NotebookLM uses Google session cookies — there is no public API key. You need 
 2. **NotebookLM: Source → Add URL** — add the URL to a notebook
 3. **NotebookLM: Artifact → Create Report** — generate a briefing doc
 4. **NotebookLM: Chat → Ask** — ask a follow-up question grounded in the source
+
+**Generate and download an audio overview:**
+
+1. **NotebookLM: Artifact → Create Audio Overview** — kick off generation (returns `artifactId`)
+2. **NotebookLM: Artifact → Wait Until Ready** — poll until status is `completed`
+3. **NotebookLM: Artifact → Download Audio** — download the MP3 as binary data
+4. **Write Binary File** — save to disk, or pipe to any other binary-capable node
+
+**Create and download an infographic from your latest notebook** ([example JSON](examples/list-create-download-infographic.json)):
+
+1. **NotebookLM: Notebook → List** — list all notebooks (returned in most-recently-accessed order)
+2. **Code** — `return [$input.first()]` to pick the latest one
+3. **NotebookLM: Artifact → Create Infographic** — kick off generation
+4. **NotebookLM: Artifact → Wait Until Ready** — poll every 5 s, up to 300 s
+5. **NotebookLM: Artifact → Download Infographic** — download the PNG as binary data
 
 ---
 
