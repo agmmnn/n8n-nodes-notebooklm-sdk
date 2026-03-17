@@ -1,5 +1,11 @@
 # n8n-nodes-notebooklm-sdk
 
+## 0.2.1
+
+### Patch Changes
+
+- 42879ee: Fix waitUntilReady polling indefinitely when artifact creation fails. Now throws a clear error immediately if artifactId is null instead of polling until timeout.
+
 ## 0.2.0
 
 ### Minor Changes
