@@ -12,11 +12,11 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/agmmnn/n8n-nodes-notebooklm.git"
+		"url": "git+https://github.com/agmmnn/n8n-nodes-notebooklm-sdk.git"
 	},
-	"homepage": "https://github.com/agmmnn/n8n-nodes-notebooklm#readme",
+	"homepage": "https://github.com/agmmnn/n8n-nodes-notebooklm-sdk#readme",
 	"bugs": {
-		"url": "https://github.com/agmmnn/n8n-nodes-notebooklm/issues"
+		"url": "https://github.com/agmmnn/n8n-nodes-notebooklm-sdk/issues"
 	},
 	"main": "index.js",
 	"scripts": {
