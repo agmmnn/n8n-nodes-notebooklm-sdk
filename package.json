@@ -1,0 +1,54 @@
+{
+	"name": "n8n-nodes-notebooklm",
+	"version": "0.1.0",
+	"description": "n8n community node for NotebookLM — manage notebooks, sources, artifacts, chat, and notes.",
+	"keywords": [
+		"n8n-community-node-package"
+	],
+	"license": "MIT",
+	"author": {
+		"name": "agmmnn",
+		"url": "https://github.com/agmmnn"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/agmmnn/n8n-nodes-notebooklm.git"
+	},
+	"homepage": "https://github.com/agmmnn/n8n-nodes-notebooklm#readme",
+	"bugs": {
+		"url": "https://github.com/agmmnn/n8n-nodes-notebooklm/issues"
+	},
+	"main": "index.js",
+	"scripts": {
+		"build": "tsc --project tsconfig.json && node scripts/copy-icons.js",
+		"dev": "tsc --project tsconfig.json --watch",
+		"lint": "eslint nodes credentials --ext .ts",
+		"prepublishOnly": "npm run build"
+	},
+	"files": [
+		"dist"
+	],
+	"n8n": {
+		"n8nNodesApiVersion": 1,
+		"credentials": [
+			"dist/credentials/NotebookLmApi.credentials.js"
+		],
+		"nodes": [
+			"dist/nodes/NotebookLm/NotebookLm.node.js"
+		]
+	},
+	"dependencies": {
+		"notebooklm-sdk": "^0.3.4"
+	},
+	"devDependencies": {
+		"@types/node": "^20.0.0",
+		"n8n-workflow": "^1.0.0",
+		"typescript": "^5.0.0"
+	},
+	"peerDependencies": {
+		"n8n-workflow": "^1.0.0"
+	},
+	"engines": {
+		"node": ">=18"
+	}
+}
