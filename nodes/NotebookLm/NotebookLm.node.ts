@@ -975,26 +975,28 @@ export class NotebookLm implements INodeType {
 
 		const credentials = await this.getCredentials("notebookLmApi");
 
-		let storageState: object;
-		try {
-			storageState = JSON.parse(credentials.sessionJson as string);
-		} catch {
-			throw new NodeOperationError(
-				this.getNode(),
-				"Invalid Session JSON — paste the full contents of ~/.notebooklm/session.json",
-			);
+		const rawSession = String(credentials.sessionJson ?? "").trim();
+		let connectOpts: any;
+
+		if (rawSession.startsWith("{") || rawSession.startsWith("[")) {
+			try {
+				const parsed = JSON.parse(rawSession);
+				connectOpts = { cookiesObject: parsed };
+			} catch {
+				connectOpts = { cookies: rawSession };
+			}
+		} else {
+			connectOpts = { cookies: rawSession };
 		}
 
 		let client: NotebookLMClient;
 		try {
-			client = await NotebookLMClient.connect({
-				cookiesObject: storageState,
-			});
+			client = await NotebookLMClient.connect(connectOpts);
 		} catch (err) {
 			const msg = err instanceof Error ? err.message : String(err);
 			throw new NodeOperationError(this.getNode(), `Auth failed: ${msg}`, {
 				description:
-					"Check your Cookie String credential. Re-run: npx notebooklm-sdk login",
+					"Check your Cookie credential. Re-run login or copy Cookie header from notebook.google.com",
 			});
 		}
 
